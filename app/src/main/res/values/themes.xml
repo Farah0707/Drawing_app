@@ -22,4 +22,5 @@
     <style name="Theme.Drawly.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.Drawly.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 </resources>
