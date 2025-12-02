@@ -5,6 +5,7 @@
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
+
         <item
             android:id="@+id/action_theme"
             android:title="Mode"
@@ -13,12 +14,13 @@
             android:checked="false"
             android:orderInCategory="100"
             app:showAsAction="never"/>
+
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/upload"
             android:icon="@drawable/upload"
             android:title="upload" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/share"
             android:icon="@drawable/share"
             android:title="share" />
 
