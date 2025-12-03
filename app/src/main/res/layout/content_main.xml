@@ -97,6 +97,17 @@
         app:tint="?attr/colorOnBackground"
 
         />
+    <ImageButton
+        android:id="@+id/saveBtn"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/save"
+        android:contentDescription="Save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:backgroundTint="@color/white" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

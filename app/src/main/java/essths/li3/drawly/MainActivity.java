@@ -52,10 +52,12 @@ public class MainActivity extends AppCompatActivity {
 
         btnColor = findViewById(R.id.btnColor);
         DrawingView drawingView = findViewById(R.id.drawingView);
+
         SeekBar brushSizeSeekBar = findViewById(R.id.brushSizeSeekBar);
         View undoBtn = findViewById(R.id.undoBtn);
         View clearBtn = findViewById(R.id.clearBtn);
         View redoBtn = findViewById(R.id.redoBtn);
+        View saveBtn = findViewById(R.id.saveBtn);
 
         // Choix couleur
         btnColor.setOnClickListener(v -> {
@@ -95,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationView navigationView = binding.navView;
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.upload, R.id.share)
+                R.id.nav_home, R.id.archive, R.id.share)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -126,6 +128,12 @@ public class MainActivity extends AppCompatActivity {
         if (undoBtn != null) undoBtn.setOnClickListener(v -> drawingView.undo());
         if (redoBtn != null) redoBtn.setOnClickListener(v -> drawingView.redo());
         if (clearBtn != null) clearBtn.setOnClickListener(v -> drawingView.clear());
+        if (saveBtn != null) {
+            saveBtn.setOnClickListener(v -> {
+                drawingView.saveToFile("drawing_" + System.currentTimeMillis());
+                Snackbar.make(v, "Image saved!", Snackbar.LENGTH_SHORT).show();
+            });
+        }
     }
 
     // Toggle mode sombre

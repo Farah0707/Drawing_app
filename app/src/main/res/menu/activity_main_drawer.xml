@@ -15,13 +15,13 @@
             app:showAsAction="never"/>
 
         <item
-            android:id="@+id/upload"
-            android:icon="@drawable/upload"
-            android:title="upload" />
+            android:id="@+id/archive"
+            android:icon="@drawable/photos2_foreground"
+            android:title="archive" />
         <item
             android:id="@+id/share"
             android:icon="@drawable/share"
-            android:title="share" />
+            android:title="Share" />
 
     </group>
 </menu>
