@@ -92,7 +92,7 @@
         app:layout_constraintEnd_toStartOf="@id/clearBtn"
         android:layout_margin="16dp"
         android:src="@drawable/redolo"
-        android:backgroundTint="@color/black"
+        android:backgroundTint="@color/white"
 
         />
 
