@@ -1,6 +1,7 @@
 package essths.li3.drawly;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -124,6 +125,12 @@ public class DrawingView extends View {
         invalidate();
     }
 
+    public Bitmap getBitmap() {
+        Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        this.draw(canvas);  // Dessine le contenu de ton view dans le bitmap
+        return bitmap;
+    }
 
 
 

@@ -1,10 +1,12 @@
 package essths.li3.drawly;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.view.MenuItem;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -21,6 +23,10 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import essths.li3.drawly.databinding.ActivityMainBinding;
 import yuku.ambilwarna.AmbilWarnaDialog;
 
@@ -28,20 +34,17 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
-    private int defaultColor = 0x000000; // rouge par défaut
+    private int defaultColor = 0x000000; // couleur par défaut
     private ImageButton btnColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Gestion mode sombre
         SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
-        boolean darkMode = prefs.getBoolean("dark_mode", false); // clair par défaut
-        if(darkMode){
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
+        boolean darkMode = prefs.getBoolean("dark_mode", false);
+        AppCompatDelegate.setDefaultNightMode(darkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
 
         // Binding
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -54,45 +57,40 @@ public class MainActivity extends AppCompatActivity {
         View clearBtn = findViewById(R.id.clearBtn);
         View redoBtn = findViewById(R.id.redoBtn);
 
-        // Couleur
+        // Choix couleur
         btnColor.setOnClickListener(v -> {
             AmbilWarnaDialog colorPicker = new AmbilWarnaDialog(MainActivity.this, defaultColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
                 @Override
                 public void onOk(AmbilWarnaDialog dialog, int color) {
-                    // alert changement
                     defaultColor = color;
                     btnColor.setColorFilter(color);
                     drawingView.setColor(color);
                 }
-
                 @Override
                 public void onCancel(AmbilWarnaDialog dialog) { }
             });
             colorPicker.show();
         });
 
-        // Épaisseur pinceau
+        // Taille pinceau
         brushSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                // alert changement
-                float brushSize = progress > 0 ? progress : 1; // jamais 0
-                drawingView.setBrushSize(brushSize);
+                drawingView.setBrushSize(progress > 0 ? progress : 1);
             }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
+            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
+            @Override public void onStopTrackingTouch(SeekBar seekBar) { }
         });
 
-        // Toolbar et navigation
+        // Toolbar
         setSupportActionBar(binding.appBarMain.toolbar);
-        binding.appBarMain.toolbar.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null)
-                .setAnchorView(R.id.toolbar).show());
+        binding.appBarMain.toolbar.setOnClickListener(view ->
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null)
+                        .setAnchorView(R.id.toolbar).show()
+        );
 
+        // Navigation
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
 
@@ -104,57 +102,73 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-
-        //  clic sur l'item "Mode"
+        // Gestion clic items navigation personnalisés
         navigationView.setNavigationItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.action_theme) {
-                int currentMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-                boolean isDark;
+            int id = item.getItemId();
 
-                if (currentMode == Configuration.UI_MODE_NIGHT_YES) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                    isDark = false;
-                } else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    isDark = true;
-                }
-
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putBoolean("dark_mode", isDark);
-                editor.apply();
-                recreate();
-
-                DrawerLayout drawer1 = binding.drawerLayout;
-                drawer1.closeDrawer(GravityCompat.START);
-
+            if (id == R.id.action_theme) {
+                toggleDarkMode();
+                drawer.closeDrawer(GravityCompat.START);
                 return true;
             }
 
-            return NavigationUI.onNavDestinationSelected(item, Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment_content_main));
+            if (id == R.id.share) {
+                shareDrawing(drawingView);
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            }
+
+            // Navigation normale pour les autres items
+            return NavigationUI.onNavDestinationSelected(item, navController);
         });
 
-        // Undo
-        if (undoBtn != null) {
-            undoBtn.setOnClickListener(v -> {
-                // alert changement
-                drawingView.undo();
-            });
-        }
+        // Undo / Redo / Clear
+        if (undoBtn != null) undoBtn.setOnClickListener(v -> drawingView.undo());
+        if (redoBtn != null) redoBtn.setOnClickListener(v -> drawingView.redo());
+        if (clearBtn != null) clearBtn.setOnClickListener(v -> drawingView.clear());
+    }
 
-        // Redo
-        if (redoBtn != null) {
-            redoBtn.setOnClickListener(v -> {
-                // alert changement
-                drawingView.redo();
-            });
-        }
+    // Toggle mode sombre
+    private void toggleDarkMode() {
+        SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
+        int currentMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        boolean isDark = currentMode != Configuration.UI_MODE_NIGHT_YES;
+        AppCompatDelegate.setDefaultNightMode(isDark ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("dark_mode", isDark);
+        editor.apply();
+        recreate();
+    }
 
-        // Clear
-        if (clearBtn != null) {
-            clearBtn.setOnClickListener(v -> {
-                // alert changement
-                drawingView.clear();
-            });
+    // Partage du dessin
+    private void shareDrawing(DrawingView drawingView) {
+        Bitmap bitmap = drawingView.getBitmap();
+
+        try {
+            File cachePath = new File(getCacheDir(), "images");
+            cachePath.mkdirs();
+            File file = new File(cachePath, "drawing.png");
+            FileOutputStream stream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            stream.close();
+
+            Uri contentUri = androidx.core.content.FileProvider.getUriForFile(
+                    this,
+                    getPackageName() + ".fileprovider",
+                    file
+            );
+
+            if (contentUri != null) {
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                shareIntent.setType("image/*");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                startActivity(Intent.createChooser(shareIntent, "Partager votre dessin via"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Erreur lors du partage", Toast.LENGTH_SHORT).show();
         }
     }
 
