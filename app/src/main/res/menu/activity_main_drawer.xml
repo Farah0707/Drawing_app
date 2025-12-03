@@ -14,10 +14,7 @@
             android:orderInCategory="100"
             app:showAsAction="never"/>
 
-        <item
-            android:id="@+id/archive"
-            android:icon="@drawable/photos2_foreground"
-            android:title="archive" />
+
         <item
             android:id="@+id/share"
             android:icon="@drawable/share"

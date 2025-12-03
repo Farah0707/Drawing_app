@@ -107,7 +107,8 @@
         android:contentDescription="Save"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:backgroundTint="@color/white" />
+        android:backgroundTint="@android:color/transparent"
+        app:tint="?attr/colorOnBackground"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

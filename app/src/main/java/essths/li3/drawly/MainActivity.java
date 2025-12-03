@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationView navigationView = binding.navView;
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.archive, R.id.share)
+                R.id.nav_home, R.id.share)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -130,10 +130,11 @@ public class MainActivity extends AppCompatActivity {
         if (clearBtn != null) clearBtn.setOnClickListener(v -> drawingView.clear());
         if (saveBtn != null) {
             saveBtn.setOnClickListener(v -> {
-                drawingView.saveToFile("drawing_" + System.currentTimeMillis());
-                Snackbar.make(v, "Image saved!", Snackbar.LENGTH_SHORT).show();
+                drawingView.saveToGallery(MainActivity.this, "drawing_" + System.currentTimeMillis());
             });
         }
+
+
     }
 
     // Toggle mode sombre
