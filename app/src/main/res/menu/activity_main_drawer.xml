@@ -5,7 +5,6 @@
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
-
         <item
             android:id="@+id/action_theme"
             android:title="Mode"

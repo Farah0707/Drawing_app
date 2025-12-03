@@ -1,11 +1,17 @@
 package essths.li3.drawly;
 
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
+import android.view.MenuItem;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -29,6 +35,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
+        boolean darkMode = prefs.getBoolean("dark_mode", false); // clair par défaut
+        if(darkMode){
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+
         // Binding
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -40,14 +54,12 @@ public class MainActivity extends AppCompatActivity {
         View clearBtn = findViewById(R.id.clearBtn);
         View redoBtn = findViewById(R.id.redoBtn);
 
-
-
-
         // Couleur
         btnColor.setOnClickListener(v -> {
             AmbilWarnaDialog colorPicker = new AmbilWarnaDialog(MainActivity.this, defaultColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
                 @Override
                 public void onOk(AmbilWarnaDialog dialog, int color) {
+                    // alert changement
                     defaultColor = color;
                     btnColor.setColorFilter(color);
                     drawingView.setColor(color);
@@ -63,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         brushSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // alert changement
                 float brushSize = progress > 0 ? progress : 1; // jamais 0
                 drawingView.setBrushSize(brushSize);
             }
@@ -91,35 +104,58 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+
+        //  clic sur l'item "Mode"
+        navigationView.setNavigationItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.action_theme) {
+                int currentMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+                boolean isDark;
+
+                if (currentMode == Configuration.UI_MODE_NIGHT_YES) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    isDark = false;
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    isDark = true;
+                }
+
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean("dark_mode", isDark);
+                editor.apply();
+                recreate();
+
+                DrawerLayout drawer1 = binding.drawerLayout;
+                drawer1.closeDrawer(GravityCompat.START);
+
+                return true;
+            }
+
+            return NavigationUI.onNavDestinationSelected(item, Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment_content_main));
+        });
+
+        // Undo
         if (undoBtn != null) {
-            undoBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    drawingView.undo();
-                }
+            undoBtn.setOnClickListener(v -> {
+                // alert changement
+                drawingView.undo();
             });
         }
+
+        // Redo
         if (redoBtn != null) {
-            redoBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    drawingView.redo();
-                }
+            redoBtn.setOnClickListener(v -> {
+                // alert changement
+                drawingView.redo();
             });
         }
 
-
+        // Clear
         if (clearBtn != null) {
-            clearBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    drawingView.clear();
-                }
+            clearBtn.setOnClickListener(v -> {
+                // alert changement
+                drawingView.clear();
             });
         }
-
-
-
     }
 
     @Override

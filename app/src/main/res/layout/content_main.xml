@@ -67,7 +67,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:src="@drawable/undolo1"
-        android:backgroundTint="@color/white"
+        android:backgroundTint="@android:color/transparent"
+        app:tint="?attr/colorOnBackground"
         />
 
 
@@ -81,8 +82,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@id/undoBtn"
         android:src="@drawable/clearlo"
-        android:backgroundTint="@color/white"
-        />
+        android:backgroundTint="@android:color/transparent"
+        app:tint="?attr/colorOnBackground" />
     <ImageButton
         android:id="@+id/redoBtn"
         android:layout_width="45dp"
@@ -92,7 +93,8 @@
         app:layout_constraintEnd_toStartOf="@id/clearBtn"
         android:layout_margin="16dp"
         android:src="@drawable/redolo"
-        android:backgroundTint="@color/white"
+        android:backgroundTint="@android:color/transparent"
+        app:tint="?attr/colorOnBackground"
 
         />
 
