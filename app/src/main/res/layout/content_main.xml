@@ -70,6 +70,8 @@
         android:backgroundTint="@color/white"
         />
 
+
+
     <ImageButton
         android:id="@+id/clearBtn"
         android:layout_width="45dp"
@@ -80,6 +82,18 @@
         app:layout_constraintEnd_toStartOf="@id/undoBtn"
         android:src="@drawable/clearlo"
         android:backgroundTint="@color/white"
+        />
+    <ImageButton
+        android:id="@+id/redoBtn"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:text="Redo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/clearBtn"
+        android:layout_margin="16dp"
+        android:src="@drawable/redolo"
+        android:backgroundTint="@color/white"
+
         />
 
 

@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         SeekBar brushSizeSeekBar = findViewById(R.id.brushSizeSeekBar);
         View undoBtn = findViewById(R.id.undoBtn);
         View clearBtn = findViewById(R.id.clearBtn);
+        View redoBtn = findViewById(R.id.redoBtn);
 
 
 
@@ -98,6 +99,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+        if (redoBtn != null) {
+            redoBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    drawingView.redo();
+                }
+            });
+        }
+
 
         if (clearBtn != null) {
             clearBtn.setOnClickListener(new View.OnClickListener() {

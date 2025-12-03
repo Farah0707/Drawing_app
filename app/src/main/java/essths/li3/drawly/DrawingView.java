@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,6 +28,8 @@ public class DrawingView extends View {
     private int currentColor = 0xFFFF0000;
     private float currentBrushSize = 10f;
     private List<Stroke> strokes = new ArrayList<>();
+    private List<Stroke> undoneStrokes = new ArrayList<>();
+
     private Path currentPath;
     private Paint currentPaint;
 
@@ -99,18 +100,30 @@ public class DrawingView extends View {
 
     public void undo() {
         if (!strokes.isEmpty()) {
-            strokes.remove(strokes.size() - 1);
-            strokes.remove(strokes.size() - 1);
+            // On enlève le dernier stroke et on le met dans undoneStrokes
+            Stroke removed = strokes.remove(strokes.size() - 1);
+            undoneStrokes.add(removed);
+            invalidate();
+        }
+    }
+
+    public void redo() {
+        if (!undoneStrokes.isEmpty()) {
+            // On reprend le dernier stroke annulé et on le remet dans strokes
+            Stroke restored = undoneStrokes.remove(undoneStrokes.size() - 1);
+            strokes.add(restored);
             invalidate();
         }
     }
 
     public void clear() {
         strokes.clear();
-        strokes.clear();
+        undoneStrokes.clear(); // aussi vider redo stack
         currentPath = null;
+        startNewStroke(); // repartir proprement
         invalidate();
     }
+
 
 
 
